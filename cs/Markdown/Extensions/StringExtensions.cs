@@ -19,7 +19,7 @@
 
         public static bool IsSubstringStartsWith(this string text, string substring, int startPosition)
         {
-            if (startPosition + substring.Length > text.Length)
+            if (startPosition < 0 || startPosition + substring.Length > text.Length)
                 return false;
             for (var i = 0; i < substring.Length; i++)
             {

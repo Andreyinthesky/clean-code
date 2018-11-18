@@ -109,25 +109,21 @@ namespace Markdown
 
         private bool IsOpeningTag(int startPosition, TagType tagType)
         {
-            char previousChar, nextChar;
-
             return
-                !(markdownString.TryGetCharAt(startPosition - 1, out previousChar)
+                !(markdownString.TryGetCharAt(startPosition - 1, out var previousChar)
                   && !(previousChar != '\\' && previousChar != tagType.Indicator[tagType.Indicator.Length - 1]))
-                && markdownString.TryGetCharAt(startPosition + tagType.Indicator.Length, out nextChar)
+                && markdownString.TryGetCharAt(startPosition + tagType.Indicator.Length, out var nextChar)
                 && char.IsLetterOrDigit(nextChar)
                 && markdownString.IsSubstringStartsWith(tagType.Indicator, startPosition);
         }
 
         private bool IsClosingTag(int startPosition, TagType tagType)
         {
-            char previousChar, nextChar;
-
             return
-                markdownString.TryGetCharAt(startPosition - 1, out previousChar)
+                markdownString.TryGetCharAt(startPosition - 1, out var previousChar)
                 && char.IsLetterOrDigit(previousChar)
                 && previousChar != '\\'
-                && (!markdownString.TryGetCharAt(startPosition + tagType.Indicator.Length, out nextChar)
+                && (!markdownString.TryGetCharAt(startPosition + tagType.Indicator.Length, out var nextChar)
                     || nextChar != tagType.Indicator.FirstOrDefault())
                 && markdownString.IsSubstringStartsWith(tagType.Indicator, startPosition);
         }
