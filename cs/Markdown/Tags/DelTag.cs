@@ -3,9 +3,14 @@ using System.Linq;
 
 namespace Markdown
 {
-    public class StrongTag : TagType, IPairTag
+    public class DelTag : TagType, IPairTag
     {
-        public StrongTag() : base("__", "strong", true, new List<TagType> {new EmTag()})
+        public DelTag() : base("~~", "del", false, new List<TagType>
+            {
+                new EmTag(),
+                new StrongTag()
+            }
+        )
         {
         }
 
@@ -17,7 +22,6 @@ namespace Markdown
                        || text.IsEscapedCharAt(startPosition - 1)))
                 && text.TryGetCharAt(startPosition + this.Indicator.Length, out var nextChar)
                 && nextChar != this.Indicator.FirstOrDefault()
-                && nextChar != ' '
                 && text.IsSubstringStartsWith(this.Indicator, startPosition);
         }
 
@@ -27,7 +31,6 @@ namespace Markdown
                 text.TryGetCharAt(startPosition - 1, out var previousChar)
                 && (previousChar != this.Indicator.LastOrDefault() && previousChar != '\\'
                     || text.IsEscapedCharAt(startPosition - 1))
-                && previousChar != ' '
                 && (!text.TryGetCharAt(startPosition + this.Indicator.Length, out var nextChar)
                     || nextChar != this.Indicator.FirstOrDefault())
                 && text.IsSubstringStartsWith(this.Indicator, startPosition);

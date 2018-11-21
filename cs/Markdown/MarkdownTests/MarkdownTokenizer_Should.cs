@@ -14,12 +14,13 @@ namespace Markdown
         private static readonly List<TagType> availableTagTypes = new List<TagType>
         {
             new EmTag(),
-            new StrongTag()
+            new StrongTag(),
+            new DelTag()
         };
 
         public void InitTokenizer(string markdownString)
         {
-            tokenizer = new MarkdownTokenizer(markdownString);
+            tokenizer = new MarkdownTokenizer(markdownString, availableTagTypes);
         }
 
         [Test]
@@ -52,6 +53,10 @@ namespace Markdown
             TestName = "text has strong tag inside em tag")]
         [TestCase("__word _another_ and another__", ExpectedResult = true,
             TestName = "text has em tag inside strong tag")]
+        [TestCase("~~word _another_ and another~~", ExpectedResult = true,
+            TestName = "text has em tag inside del tag")]
+        [TestCase("~~word __another__ and another~~", ExpectedResult = true,
+            TestName = "text has strong tag inside del tag")]
         public bool GetTokens_WhenStringHasInnerTags_ShouldBeCorrect(string markdownString)
         {
             InitTokenizer(markdownString);

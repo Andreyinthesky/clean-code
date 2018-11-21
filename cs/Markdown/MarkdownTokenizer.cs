@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using FluentAssertions;
 using FluentAssertions.Equivalency;
 
 namespace Markdown
@@ -8,15 +9,12 @@ namespace Markdown
     {
         private readonly string markdownString;
         private int currentPosition;
-        private readonly List<TagType> availableTagTypes = new List<TagType>
-        {
-            new EmTag(),
-            new StrongTag()
-        };
+        private readonly IEnumerable<TagType> availableTagTypes;
 
-        public MarkdownTokenizer(string markdownString)
+        public MarkdownTokenizer(string markdownString, IEnumerable<TagType> availableTagTypes)
         {
             this.markdownString = markdownString;
+            this.availableTagTypes = availableTagTypes;
         }
 
         public IEnumerable<Token> GetTokens()
@@ -63,7 +61,8 @@ namespace Markdown
                 var tagContent = markdownString.Substring(currentPosition + tagType.Indicator.Length,
                     closingTagTokenInfo.OpeningIndex - currentPosition - tagType.Indicator.Length);
                 var possibleTagToken = new Token(currentPosition, tagContent, tagType);
-                if (IsDigitLessToken(possibleTagToken))
+                if (!possibleTagToken.TagType.IsDigitLess 
+                    || possibleTagToken.TagType.IsDigitLess && IsDigitLessToken(possibleTagToken))
                 {
                     return possibleTagToken;
                 }
@@ -84,7 +83,7 @@ namespace Markdown
             {
                 foreach (var tagType in availableTagTypes)
                 {
-                    currentTagType = IsOpeningTag(currentPosition, tagType) ? tagType : currentTagType;
+                    currentTagType = ((IPairTag) tagType).IsOpeningTag(markdownString, currentPosition) ? tagType : currentTagType;
                 }
 
                 if (currentTagType != null)
@@ -102,37 +101,13 @@ namespace Markdown
             var indicator = openTagType.Indicator;
             for (var pos = currentPosition + indicator.Length; pos < markdownString.Length - indicator.Length + 1; pos++)
             {
-                if (IsClosingTag(pos, openTagType))
+                if (((IPairTag) openTagType).IsClosingTag(markdownString, pos))
                 {
                     return new TokenInfo(pos, pos + indicator.Length - 1, openTagType);
                 }
             }
 
             return null;
-        }
-
-        private bool IsOpeningTag(int startPosition, TagType tagType)
-        {
-            return
-                !(markdownString.TryGetCharAt(startPosition - 1, out var previousChar)
-                  && !(previousChar != tagType.Indicator.LastOrDefault() && previousChar != '\\'
-                       || markdownString.IsEscapedCharAt(startPosition - 1)))
-                && markdownString.TryGetCharAt(startPosition + tagType.Indicator.Length, out var nextChar)
-                && nextChar != tagType.Indicator.FirstOrDefault()
-                && nextChar != ' '
-                && markdownString.IsSubstringStartsWith(tagType.Indicator, startPosition);
-        }
-
-        private bool IsClosingTag(int startPosition, TagType tagType)
-        {
-            return
-                markdownString.TryGetCharAt(startPosition - 1, out var previousChar)
-                && (previousChar != tagType.Indicator.LastOrDefault() && previousChar != '\\'
-                    || markdownString.IsEscapedCharAt(startPosition - 1))
-                && previousChar != ' '
-                && (!markdownString.TryGetCharAt(startPosition + tagType.Indicator.Length, out var nextChar)
-                    || nextChar != tagType.Indicator.FirstOrDefault())
-                && markdownString.IsSubstringStartsWith(tagType.Indicator, startPosition);
         }
 
         private bool IsDigitLessToken(Token token)
