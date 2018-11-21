@@ -1,4 +1,6 @@
-﻿namespace Markdown
+﻿using System.Text;
+
+namespace Markdown
 {
     public static class StringExtensions
     {
@@ -11,10 +13,33 @@
             return true;
         }
 
+        public static bool IsEscapedCharAt(this string text, int startPosition)
+        {
+            return text.TryGetCharAt(startPosition, out var character)
+                   && text.TryGetCharAt(startPosition - 1, out character)
+                   && character == '\\';
+        }
 
         public static string RemoveEscapes(this string text)
         {
-            return text.Replace("\\", "");
+            var result = new StringBuilder();
+
+            for (var index = 0; index < text.Length; index++)
+            {
+                if (text[index] == '\\')
+                {
+                    if (TryGetCharAt(text, index + 1, out var nextChar))
+                    {
+                        result.Append(nextChar);
+                        index++;
+                        continue;
+                    }
+                    break;
+                }
+                result.Append(text[index]);
+            }
+
+            return result.ToString();
         }
 
         public static bool IsSubstringStartsWith(this string text, string substring, int startPosition)

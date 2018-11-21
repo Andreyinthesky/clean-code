@@ -7,12 +7,6 @@ namespace Markdown
 {
     public class Md
     {
-        private readonly List<TagType> availableTagTypes = new List<TagType>
-        {
-            new EmTag(),
-            new StrongTag()
-        };
-
         public Md()
         {
         }
@@ -21,21 +15,20 @@ namespace Markdown
         {
             if (paragraph == null)
                 throw new NullReferenceException("paragraph was null");
-            return ConvertToHtmlString(paragraph, availableTagTypes).RemoveEscapes();
+            return ConvertToHtmlString(paragraph).RemoveEscapes();
         }
 
-        public string ConvertToHtmlString(string paragraph, List<TagType> tagTypes)
+        public string ConvertToHtmlString(string paragraph)
         {
             var result = new StringBuilder();
-            var markdownTokenizer = new MarkdownTokenizer(paragraph, tagTypes);
+            var markdownTokenizer = new MarkdownTokenizer(paragraph);
             foreach (var token in markdownTokenizer.GetTokens())
             {
                 string htmlTag;
                 if (token.TokenType == TokenType.Tag)
                 {
-                    var innerTagTypes = availableTagTypes.Where(e => token.TagType.IsInAvailableInnerTagTypes(e)).ToList();
-                    var tokenContent = innerTagTypes.Any()
-                        ? ConvertToHtmlString(token.Content, innerTagTypes)
+                    var tokenContent = token.TagType.AvailableInnerTagTypes.Any()
+                        ? ConvertToHtmlString(token.Content)
                         : token.Content;
                     htmlTag = token.TagType.ToHtml(tokenContent);
                 }

@@ -11,7 +11,6 @@ namespace Markdown
     public class MarkdownTokenizer_Should
     {
         private MarkdownTokenizer tokenizer;
-
         private static readonly List<TagType> availableTagTypes = new List<TagType>
         {
             new EmTag(),
@@ -20,7 +19,7 @@ namespace Markdown
 
         public void InitTokenizer(string markdownString)
         {
-            tokenizer = new MarkdownTokenizer(markdownString, availableTagTypes);
+            tokenizer = new MarkdownTokenizer(markdownString);
         }
 
         [Test]
@@ -58,7 +57,7 @@ namespace Markdown
             InitTokenizer(markdownString);
             var tokens = tokenizer.GetTokens().ToList();
             return tokens.Count == 1
-                   && availableTagTypes.Any(e => tokens[0].TagType.IsInAvailableInnerTagTypes(e));
+                   && tokens[0].TagType.AvailableInnerTagTypes.Any();
         }
 
         private static IEnumerable StringHasSingleTags_TestCases

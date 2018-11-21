@@ -7,17 +7,14 @@ namespace Markdown
     {
         public string Indicator { get; }
         public string HtmlTag { get; }
-        private readonly IEnumerable<TagType> availableInnerTagTypes;
+        public IEnumerable<TagType> AvailableInnerTagTypes { get; }
 
         protected TagType(string indicator, string htmlTag, IEnumerable<TagType> availableInnerTagTypes)
         {
             Indicator = indicator;
             HtmlTag = htmlTag;
-            this.availableInnerTagTypes = availableInnerTagTypes;
+            AvailableInnerTagTypes = availableInnerTagTypes;
         }
-
-        public bool IsInAvailableInnerTagTypes(TagType tagType) =>
-            availableInnerTagTypes?.Any(t => t.GetType() == tagType.GetType()) ?? false;
 
         public string ToHtml(string text) => $"<{HtmlTag}>{text}</{HtmlTag}>";
     }

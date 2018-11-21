@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using FluentAssertions.Equivalency;
 
 namespace Markdown
 {
@@ -7,12 +8,15 @@ namespace Markdown
     {
         private readonly string markdownString;
         private int currentPosition;
-        private readonly List<TagType> availableTagTypes;
+        private readonly List<TagType> availableTagTypes = new List<TagType>
+        {
+            new EmTag(),
+            new StrongTag()
+        };
 
-        public MarkdownTokenizer(string markdownString, List<TagType> availableTagTypes)
+        public MarkdownTokenizer(string markdownString)
         {
             this.markdownString = markdownString;
-            this.availableTagTypes = availableTagTypes;
         }
 
         public IEnumerable<Token> GetTokens()
@@ -111,9 +115,11 @@ namespace Markdown
         {
             return
                 !(markdownString.TryGetCharAt(startPosition - 1, out var previousChar)
-                  && !(previousChar != '\\' && previousChar != tagType.Indicator[tagType.Indicator.Length - 1]))
+                  && !(previousChar != tagType.Indicator.LastOrDefault() && previousChar != '\\'
+                       || markdownString.IsEscapedCharAt(startPosition - 1)))
                 && markdownString.TryGetCharAt(startPosition + tagType.Indicator.Length, out var nextChar)
-                && char.IsLetterOrDigit(nextChar)
+                && nextChar != tagType.Indicator.FirstOrDefault()
+                && nextChar != ' '
                 && markdownString.IsSubstringStartsWith(tagType.Indicator, startPosition);
         }
 
@@ -121,8 +127,9 @@ namespace Markdown
         {
             return
                 markdownString.TryGetCharAt(startPosition - 1, out var previousChar)
-                && char.IsLetterOrDigit(previousChar)
-                && previousChar != '\\'
+                && (previousChar != tagType.Indicator.LastOrDefault() && previousChar != '\\'
+                    || markdownString.IsEscapedCharAt(startPosition - 1))
+                && previousChar != ' '
                 && (!markdownString.TryGetCharAt(startPosition + tagType.Indicator.Length, out var nextChar)
                     || nextChar != tagType.Indicator.FirstOrDefault())
                 && markdownString.IsSubstringStartsWith(tagType.Indicator, startPosition);

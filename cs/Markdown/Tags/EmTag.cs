@@ -4,7 +4,7 @@ namespace Markdown
 {
     public class EmTag : TagType
     {
-        public EmTag() : base("_", "em", null)
+        public EmTag() : base("_", "em", new List<TagType>())
         {
         }
     }

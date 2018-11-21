@@ -73,5 +73,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Content Include="MarkdownTests\PerformanceCases\bigword_1000.txt" />
+    <Content Include="MarkdownTests\PerformanceCases\bigword_10000.txt" />
+    <Content Include="MarkdownTests\PerformanceCases\bigword_100000.txt" />
+    <Content Include="MarkdownTests\PerformanceCases\inner_tags_1000.txt" />
+    <Content Include="MarkdownTests\PerformanceCases\inner_tags_100000.txt" />
+    <Content Include="MarkdownTests\PerformanceCases\single_tags_1000.txt" />
+    <Content Include="MarkdownTests\PerformanceCases\single_tags_100000.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
