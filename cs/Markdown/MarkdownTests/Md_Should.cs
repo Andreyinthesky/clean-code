@@ -66,6 +66,14 @@ namespace Markdown
             TestName = "word edged single underlines and escape char before closing underline")]
         [TestCase(@"\\_a\\_", ExpectedResult = @"\<em>a\</em>",
             TestName = "word edged single underlines and escape char before opening and closing underline")]
+
+        [TestCase(@"\\\_a_", ExpectedResult = @"\_a_",
+            TestName = "word edged single underlines and escape char before escaped opening underline")]
+        [TestCase(@"_a\\\_", ExpectedResult = @"_a\_",
+            TestName = "word edged single underlines and escape char before escaped closing underline")]
+        [TestCase(@"\\\_a\\\_", ExpectedResult = @"\_a\_",
+            TestName = "word edged single underlines and escape char before escaped opening and closing underline")]
+
         [TestCase(@"\\\\_a_", ExpectedResult = @"\\<em>a</em>", 
             TestName = "word edged single underlines and double escape char before opening underline")]
         [TestCase(@"_a\\\\_", ExpectedResult = @"<em>a\\</em>",

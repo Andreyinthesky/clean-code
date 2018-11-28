@@ -15,9 +15,15 @@ namespace Markdown
 
         public static bool IsEscapedCharAt(this string text, int startPosition)
         {
-            return text.TryGetCharAt(startPosition, out var character)
-                   && text.TryGetCharAt(startPosition - 1, out character)
-                   && character == '\\';
+            if (!text.TryGetCharAt(startPosition, out var character))
+                return false;
+            var escapeCharRepeatCount = 0;
+            while (text.TryGetCharAt(--startPosition, out character) && character == '\\')
+            {
+                escapeCharRepeatCount++;
+            }
+
+            return escapeCharRepeatCount % 2 != 0;
         }
 
         public static string RemoveEscapes(this string text)
